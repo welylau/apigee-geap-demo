@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy name="cymbal-ge-demo-extproc" revision="1">
+    <DisplayName>cymbal-ge-demo-extproc</DisplayName>
+    <Description>No-target Apigee extension processor proxy used by Agent Gateway cymbal-ge-demo-agw as its CONTENT_AUTHZ authorization extension. Governs only the third-party credit-bureau host: 3 paid lookups per 2 minutes per agent identity (fallback per host). Everything else passes.</Description>
+    <BasePaths>/</BasePaths>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+</APIProxy>

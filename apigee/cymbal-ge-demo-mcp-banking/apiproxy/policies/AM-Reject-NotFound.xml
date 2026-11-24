@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Unknown path suffix (404). -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Reject-NotFound">
+    <AssignVariable>
+        <Name>cymbal.reject</Name>
+        <Value>unknown-path</Value>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

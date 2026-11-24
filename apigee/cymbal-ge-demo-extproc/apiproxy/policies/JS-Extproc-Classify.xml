@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Decides whether the intercepted request is a paid credit-bureau lookup and which quota key applies.
+     continueOnError: a script failure must never deny the agent's other traffic. -->
+<Javascript continueOnError="true" enabled="true" name="JS-Extproc-Classify" timeLimit="200">
+    <IncludeURL>jsc://extproc-lib.js</IncludeURL>
+    <ResourceURL>jsc://extproc-classify.js</ResourceURL>
+</Javascript>

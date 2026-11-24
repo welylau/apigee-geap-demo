@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Demo on-behalf-of token. Algorithm is fixed (HS256); secret >= 32 bytes (setup-apigee.sh generates 64).
+     sub = end user, act = the agent it is delegated to (RFC 8693 actor claim; act.sub = the agent's Apigee app). -->
+<GenerateJWT continueOnError="false" enabled="true" name="JWT-Generate-UserToken">
+    <Algorithm>HS256</Algorithm>
+    <SecretKey>
+        <Value ref="private.cymbal.jwt_secret"/>
+    </SecretKey>
+    <Subject ref="cymbal.sub"/>
+    <Issuer>cymbal-ge-demo</Issuer>
+    <Audience>cymbal-banking-mcp</Audience>
+    <ExpiresIn>900s</ExpiresIn>
+    <Id/>
+    <AdditionalClaims>
+        <Claim name="role" ref="cymbal.role"/>
+        <Claim name="scope" ref="cymbal.scope"/>
+        <Claim name="transfer_limit" ref="cymbal.transfer_limit" type="number"/>
+        <Claim name="name" ref="cymbal.display_name"/>
+        <Claim name="act" ref="cymbal.act_json" type="map"/>
+    </AdditionalClaims>
+    <OutputVariable>cymbal.jwt</OutputVariable>
+</GenerateJWT>

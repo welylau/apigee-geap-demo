@@ -1,0 +1,23 @@
+# CONTENT_AUTHZ policy: send ONLY Credit Bureau traffic to the Apigee
+# extension processor (quota on a paid third-party call). Everything else -
+# Apigee MCP/LLM (already behind Apigee), session/telemetry/platform APIs -
+# is never sent to the callout.
+# Ref: extension-processor-agent-gateway.md "Create the authorization policy"
+#      (narrow the default prefix "/" with to.operations or a CEL `when`).
+name: projects/${PROJECT_ID}/locations/${REGION}/authzPolicies/${APIGEE_POLICY}
+action: CUSTOM
+policyProfile: CONTENT_AUTHZ
+customProvider:
+  authzExtension:
+    resources:
+      - projects/${PROJECT_ID}/locations/${REGION}/authzExtensions/${APIGEE_EXT}
+httpRules:
+  - to:
+      operations:
+        - hosts:
+            - exact: "${CREDIT_BUREAU_HOST}"
+          paths:
+            - prefix: "/mcp"
+target:
+  resources:
+    - ${AGW_RESOURCE}

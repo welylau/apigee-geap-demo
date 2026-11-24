@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  cymbal-ge-demo-credit-bureau   POST /cymbal-ge-demo/bureau[/ | /mcp]  ->  Cloud Run credit bureau /mcp
+  Caller: RM Agent with the x-api-key of cymbal-ge-demo-agent-app (product cymbal-ge-demo-internal-agent).
+
+  Request:  method guard (POST) -> path guard -> VA-VerifyKey -> SA-Protect -> JS-Bureau-Classify
+            -> Q-Credit-Bureau only when bureau.paid = "true" (JSON-RPC tools/call)  => 429 credit-bureau-quota
+  Response: AM-Bureau-Response-Headers adds decision headers on 2xx ONLY; the response body is never read or
+            changed (Agent Gateway Model Armor inspects it for S3). Bureau 4xx pass through untouched
+            (the bureau sets x-cymbal-decided-by: backend itself).
+  Errors:   DefaultFaultRule (AlwaysEnforce) -> JS-Build-Error + AM-Error-Response (JSON-RPC error shape).
+-->
+<ProxyEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>AM-Reject-Method</Name>
+                <Condition>request.verb != "POST"</Condition>
+            </Step>
+            <Step>
+                <Name>AM-Reject-NotFound</Name>
+                <Condition>(proxy.pathsuffix != null) and (proxy.pathsuffix != "") and (proxy.pathsuffix != "/") and (proxy.pathsuffix != "/mcp")</Condition>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>VA-VerifyKey</Name>
+            </Step>
+            <Step>
+                <Name>SA-Protect</Name>
+            </Step>
+            <Step>
+                <Name>JS-Bureau-Classify</Name>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>Q-Credit-Bureau</Name>
+                <Condition>bureau.paid = "true"</Condition>
+            </Step>
+        </Request>
+        <Response>
+            <Step>
+                <Name>AM-Bureau-Response-Headers</Name>
+                <Condition>(response.status.code &gt;= 200) and (response.status.code &lt; 300)</Condition>
+            </Step>
+        </Response>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <DefaultFaultRule name="default">
+        <AlwaysEnforce>true</AlwaysEnforce>
+        <Step>
+            <Name>JS-Build-Error</Name>
+        </Step>
+        <Step>
+            <Name>AM-Error-Response</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPProxyConnection>
+        <BasePath>/cymbal-ge-demo/bureau</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="bureau">
+        <TargetEndpoint>bureau</TargetEndpoint>
+    </RouteRule>
+</ProxyEndpoint>

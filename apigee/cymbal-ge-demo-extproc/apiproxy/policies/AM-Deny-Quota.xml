@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Verdict = deny. Body/headers per DESIGN.md (decided_by apigee-extproc). -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Deny-Quota">
+    <Set>
+        <Headers>
+            <Header name="Content-Type">application/json</Header>
+            <Header name="x-cymbal-decided-by">apigee-extproc</Header>
+            <Header name="x-cymbal-policy">credit-bureau-quota</Header>
+        </Headers>
+        <Payload contentType="application/json">{"error":{"decided_by":"apigee-extproc","policy":"credit-bureau-quota","message":"Credit bureau lookups are limited to 3 per 2 minutes for this agent. Try again later."}}</Payload>
+        <StatusCode>429</StatusCode>
+        <ReasonPhrase>Too Many Requests</ReasonPhrase>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

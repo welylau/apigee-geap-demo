@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  cymbal-ge-demo-token  POST /cymbal-ge-demo/token   {"user":"rm-alice"|"teller-bob","actor":"rm-agent"|"insights-agent"}
+  Returns an on-behalf-of JWT: sub = user, act.sub = the Apigee app of the agent it is delegated to.
+  Caller: the web UI BFF with the x-api-key of app cymbal-ge-demo-webui-app (product cymbal-ge-demo-webui).
+  The BFF is the authenticating party (IAP in front of Cloud Run); these are demo personas, not real users.
+  TODO(security): a production identity facade would authenticate the end user (OIDC) before minting.
+  No target: the JWT is generated in the proxy and returned directly.
+  Errors: DefaultFaultRule (AlwaysEnforce) -> JS-Build-Error maps cymbal.reject / fault.name to a sanitized
+  JSON body; AM-Error-Response writes it with x-cymbal-decided-by / x-cymbal-policy.
+-->
+<ProxyEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>AM-Reject-Method</Name>
+                <Condition>request.verb != "POST"</Condition>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>VA-VerifyKey</Name>
+            </Step>
+            <Step>
+                <Name>SA-Protect</Name>
+            </Step>
+        </Request>
+        <Response/>
+    </PreFlow>
+    <Flows>
+        <Flow name="issue-token">
+            <Condition>(proxy.pathsuffix = null) or (proxy.pathsuffix = "") or (proxy.pathsuffix = "/")</Condition>
+            <Request>
+                <Step>
+                    <Name>JS-Resolve-User</Name>
+                </Step>
+                <Step>
+                    <Name>RF-Reject</Name>
+                    <Condition>cymbal.reject != null</Condition>
+                </Step>
+                <Step>
+                    <Name>KVM-Get-JwtSecret</Name>
+                </Step>
+                <Step>
+                    <Name>AM-Reject-Config</Name>
+                    <Condition>(private.cymbal.jwt_secret = null) or (private.cymbal.jwt_secret = "")</Condition>
+                </Step>
+                <Step>
+                    <Name>RF-Reject</Name>
+                    <Condition>cymbal.reject != null</Condition>
+                </Step>
+                <Step>
+                    <Name>JWT-Generate-UserToken</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>AM-Token-Response</Name>
+                </Step>
+            </Response>
+        </Flow>
+        <Flow name="not-found">
+            <Request>
+                <Step>
+                    <Name>AM-Reject-NotFound</Name>
+                </Step>
+                <Step>
+                    <Name>RF-Reject</Name>
+                </Step>
+            </Request>
+            <Response/>
+        </Flow>
+    </Flows>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <DefaultFaultRule name="default">
+        <AlwaysEnforce>true</AlwaysEnforce>
+        <Step>
+            <Name>JS-Build-Error</Name>
+        </Step>
+        <Step>
+            <Name>AM-Error-Response</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPProxyConnection>
+        <BasePath>/cymbal-ge-demo/token</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="no-target"/>
+</ProxyEndpoint>

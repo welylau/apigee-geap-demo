@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy name="cymbal-ge-demo-credit-bureau" revision="1">
+    <DisplayName>cymbal-ge-demo-credit-bureau</DisplayName>
+    <Description>Third-party credit bureau (Cloud Run MCP server) as a paid API behind Apigee: VerifyAPIKey (internal-agent product), 3 tools/call lookups per minute per app (MCP handshake free), transparent passthrough of the bureau's response body, bureau 5xx sanitized to 502.</Description>
+    <BasePaths>/cymbal-ge-demo/bureau</BasePaths>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+    <TargetEndpoints>
+        <TargetEndpoint>bureau</TargetEndpoint>
+    </TargetEndpoints>
+</APIProxy>

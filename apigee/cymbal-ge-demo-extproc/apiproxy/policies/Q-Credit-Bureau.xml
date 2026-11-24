@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- DESIGN.md S5: 3 paid credit-bureau lookups per 2 minutes per agent identity (fallback: per host).
+     Distributed + synchronous per extension-processor-policies.md (precise shared count); rollingwindow so the
+     4th lookup inside 2 minutes is always denied. -->
+<Quota continueOnError="false" enabled="true" name="Q-Credit-Bureau" type="rollingwindow">
+    <Allow count="3"/>
+    <Interval>2</Interval>
+    <TimeUnit>minute</TimeUnit>
+    <Identifier ref="cymbal.quota_key"/>
+    <Distributed>true</Distributed>
+    <Synchronous>true</Synchronous>
+</Quota>

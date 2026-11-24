@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Enters the error flow. The DefaultFaultRule (AlwaysEnforce) replaces status, headers and body
+     from cymbal.reject, so nothing here reaches the client verbatim. -->
+<RaiseFault continueOnError="false" enabled="true" name="RF-Reject">
+    <FaultResponse>
+        <Set>
+            <StatusCode>400</StatusCode>
+            <ReasonPhrase>Bad Request</ReasonPhrase>
+        </Set>
+    </FaultResponse>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</RaiseFault>

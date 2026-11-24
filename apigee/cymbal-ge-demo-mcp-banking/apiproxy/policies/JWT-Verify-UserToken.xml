@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- End-user token minted by cymbal-ge-demo-token. Algorithm hard-coded (never taken from the token header),
+     signature + iss + aud + exp/nbf checked. Runs only when x-user-token is present; JS-Mcp-Authorize decides
+     whether a token is required (product attribute user_token_required, and always for transfer_funds). -->
+<VerifyJWT continueOnError="false" enabled="true" name="JWT-Verify-UserToken">
+    <Algorithm>HS256</Algorithm>
+    <Source>request.header.x-user-token</Source>
+    <SecretKey>
+        <Value ref="private.cymbal.jwt_secret"/>
+    </SecretKey>
+    <Issuer>cymbal-ge-demo</Issuer>
+    <Audience>cymbal-banking-mcp</Audience>
+    <TimeAllowance>30s</TimeAllowance>
+</VerifyJWT>

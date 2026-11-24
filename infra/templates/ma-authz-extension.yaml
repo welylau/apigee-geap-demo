@@ -1,0 +1,8 @@
+# Model Armor CONTENT_AUTHZ extension (same template for request and response).
+# Ref: delegate-authorization.md "Delegate authorization to Model Armor" (gcloud)
+name: ${MA_EXT}
+service: modelarmor.${REGION}.rep.googleapis.com
+metadata:
+  model_armor_settings: '[{"request_template_id": "${MA_TEMPLATE_RESOURCE}", "response_template_id": "${MA_TEMPLATE_RESOURCE}"}]'
+failOpen: false
+timeout: 1s

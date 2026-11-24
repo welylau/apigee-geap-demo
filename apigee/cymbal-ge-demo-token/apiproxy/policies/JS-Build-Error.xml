@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Error flow: maps cymbal.reject or the native fault to a sanitized status/body
+     (no policy names, keys or faultstring). continueOnError so a script bug still yields AM-Error-Response. -->
+<Javascript continueOnError="true" enabled="true" name="JS-Build-Error" timeLimit="200">
+    <ResourceURL>jsc://build-error.js</ResourceURL>
+</Javascript>

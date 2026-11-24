@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Per-app burst guard on all bureau traffic (handshake included). The paid-API limit is Q-Credit-Bureau. -->
+<SpikeArrest continueOnError="false" enabled="true" name="SA-Protect">
+    <Rate>120pm</Rate>
+    <Identifier ref="verifyapikey.VA-VerifyKey.client_id"/>
+    <UseEffectiveCount>true</UseEffectiveCount>
+</SpikeArrest>

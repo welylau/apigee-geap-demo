@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  cymbal-ge-demo-llm
+    POST /cymbal-ge-demo/llm/v1/projects/{p}/locations/global/publishers/google/models/{model}:generateContent
+  Caller: x-api-key of an app on cymbal-ge-demo-internal-agent. {p} is ignored: the gateway always calls
+  the project in resources/properties/llm.properties (callers cannot choose a project or a target URL).
+
+  Request:  method guard -> VA-VerifyKey -> JS-Llm-Route (path, streaming reject, allowlist, cymbal-auto)
+            -> LTQ-Enforce (EnforceOnly, limit/interval/unit from the API product)
+  Response: JS-Llm-Usage -> LTQ-Count (CountOnly, totalTokenCount, only when usage is valid) -> headers
+  Ordering follows apigee-x-ai-gateway model-routing.md / token-quota.md.
+-->
+<ProxyEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>AM-Reject-Method</Name>
+                <Condition>request.verb != "POST"</Condition>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>VA-VerifyKey</Name>
+            </Step>
+            <Step>
+                <Name>JS-Llm-Route</Name>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>LTQ-Enforce</Name>
+            </Step>
+        </Request>
+        <Response>
+            <Step>
+                <Name>JS-Llm-Usage</Name>
+            </Step>
+            <Step>
+                <Name>LTQ-Count</Name>
+                <Condition>(response.status.code = 200) and (ai.usage.valid = "true")</Condition>
+            </Step>
+            <Step>
+                <Name>AM-Llm-Response-Headers</Name>
+            </Step>
+        </Response>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <DefaultFaultRule name="default">
+        <AlwaysEnforce>true</AlwaysEnforce>
+        <Step>
+            <Name>JS-Build-Error</Name>
+        </Step>
+        <Step>
+            <Name>AM-Error-Response</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPProxyConnection>
+        <BasePath>/cymbal-ge-demo/llm</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="vertex">
+        <TargetEndpoint>vertex</TargetEndpoint>
+    </RouteRule>
+</ProxyEndpoint>

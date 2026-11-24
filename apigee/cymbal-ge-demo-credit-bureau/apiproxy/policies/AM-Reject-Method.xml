@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Marks the request for rejection (405); RF-Reject raises, JS-Build-Error formats. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Reject-Method">
+    <AssignVariable>
+        <Name>cymbal.reject</Name>
+        <Value>method-not-allowed</Value>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

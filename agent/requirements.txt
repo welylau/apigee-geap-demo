@@ -1,0 +1,9 @@
+# Agent Runtime installs these INTO the platform's own Python env (assembly-service-py313).
+# Keep the platform's preinstalled OpenTelemetry + google-auth versions: the first deploy
+# failed with no container logs after pip upgraded opentelemetry-api/sdk 1.42.1 -> 1.45.2,
+# semantic-conventions 0.63b1 -> 0.66b2 and google-auth 2.55.2 -> 2.62.2 underneath the
+# platform server. Keep in sync with pyproject.toml.
+google-adk==2.14.1
+google-cloud-aiplatform[agent_engines,adk]==2.9.0
+opentelemetry-api==1.42.1
+opentelemetry-sdk==1.42.1

@@ -1,0 +1,14 @@
+# Apigee extension processor as an Agent Gateway authorization extension.
+# Ref: extension-processor-agent-gateway.md "Create the authorization extension"
+# EXTPROC_HOST must equal the Apigee envgroup hostname AND the private DNS A record.
+name: projects/${PROJECT_ID}/locations/${REGION}/authzExtensions/${APIGEE_EXT}
+authority: ${EXTPROC_HOST}
+service: ${EXTPROC_HOST}
+timeout: 5s
+failOpen: false
+metadata:
+  apigee-extension-processor: ${EXTPROC_PROXY}
+  # Request body lets the proxy inspect the MCP JSON-RPC method if it wants to
+  # (e.g. count only tools/call). Response body is not needed for a quota.
+  apigee-request-body: 'true'
+  apigee-response-body: 'false'

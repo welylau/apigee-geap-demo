@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 2xx only. Headers ONLY: no <Payload>, no Remove of content, so the bureau body (incl. the CUST-666
+     prompt injection) reaches Agent Gateway Model Armor byte-for-byte. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Bureau-Response-Headers">
+    <Set>
+        <Headers>
+            <Header name="x-cymbal-decided-by">apigee</Header>
+            <Header name="x-cymbal-policy">allow</Header>
+            <Header name="x-cymbal-upstream">credit-bureau</Header>
+        </Headers>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Attribute form of AssignTo so Apigee's native fault body is replaced
+     (apigee-x-ai-gateway model-routing.md: sanitized errors). All variables are set by JS-Build-Error. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Error-Response">
+    <Set>
+        <Headers>
+            <Header name="Content-Type">application/json</Header>
+            <Header name="Cache-Control">no-store</Header>
+            <Header name="x-cymbal-decided-by">apigee</Header>
+            <Header name="x-cymbal-policy">{cymbal.err_policy}</Header>
+        </Headers>
+        <Payload contentType="application/json">{cymbal.err_body}</Payload>
+        <StatusCode>{cymbal.err_status}</StatusCode>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

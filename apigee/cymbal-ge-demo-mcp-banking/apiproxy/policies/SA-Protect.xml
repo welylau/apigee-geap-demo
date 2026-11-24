@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Per-app burst guard on every MCP call (initialize, list, call). Business quota is Q-Product-Quota. -->
+<SpikeArrest continueOnError="false" enabled="true" name="SA-Protect">
+    <Rate>300pm</Rate>
+    <Identifier ref="verifyapikey.VA-VerifyKey.client_id"/>
+    <UseEffectiveCount>true</UseEffectiveCount>
+</SpikeArrest>

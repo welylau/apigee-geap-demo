@@ -1,0 +1,10 @@
+# Agent Gateway (egress / Agent-to-Anywhere) - rendered by 02-agent-gateway.sh
+# Ref: set-up-agent-gateway.md "Configure Agent Gateway in Agent-to-Anywhere (egress) mode"
+name: ${AGW_NAME}
+description: "Cymbal Bank demo egress gateway (RM Agent -> Apigee MCP/LLM, Credit Bureau)"
+protocols:
+  - MCP
+googleManaged:
+  governedAccessPath: AGENT_TO_ANYWHERE
+registries:
+  - ${REGISTRY_PATH}

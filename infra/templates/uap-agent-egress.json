@@ -1,0 +1,104 @@
+[
+ {
+  "description": "RM Agent -> Apigee MCP server (core banking tools)",
+  "effect": "ALLOW",
+  "principals": [
+   "${AGENT_PRINCIPAL}"
+  ],
+  "operation": {
+   "permissions": [
+    "iap.googleapis.com/resources.egressViaIAP"
+   ]
+  },
+  "conditions": {
+   "iap.googleapis.com": {
+    "expression": "destination.is_registered == true && destination.agent_registry.mcp_server.name in ['${MCP_BANKING_RESOURCE}', '${MCP_BANKING_RESOURCE_ALT}']"
+   }
+  }
+ },
+ {
+  "description": "RM Agent -> Credit Bureau MCP server via Apigee (quota in Apigee)",
+  "effect": "ALLOW",
+  "principals": [
+   "${AGENT_PRINCIPAL}"
+  ],
+  "operation": {
+   "permissions": [
+    "iap.googleapis.com/resources.egressViaIAP"
+   ]
+  },
+  "conditions": {
+   "iap.googleapis.com": {
+    "expression": "destination.is_registered == true && destination.agent_registry.mcp_server.name in ['${CREDIT_BUREAU_RESOURCE}', '${CREDIT_BUREAU_RESOURCE_ALT}']"
+   }
+  }
+ },
+ {
+  "description": "RM Agent -> Apigee LLM gateway endpoint (cymbal-auto)",
+  "effect": "ALLOW",
+  "principals": [
+   "${AGENT_PRINCIPAL}"
+  ],
+  "operation": {
+   "permissions": [
+    "iap.googleapis.com/resources.egressViaIAP"
+   ]
+  },
+  "conditions": {
+   "iap.googleapis.com": {
+    "expression": "destination.is_registered == true && destination.agent_registry.endpoint.name in ['${LLM_ENDPOINT_RESOURCE}', '${LLM_ENDPOINT_RESOURCE_ALT}']"
+   }
+  }
+ },
+ {
+  "description": "RM Agent -> essential Agent Platform hosts (1/2; UAP lists max 10 items)",
+  "effect": "ALLOW",
+  "principals": [
+   "${AGENT_PRINCIPAL}"
+  ],
+  "operation": {
+   "permissions": [
+    "iap.googleapis.com/resources.egressViaIAP"
+   ]
+  },
+  "conditions": {
+   "iap.googleapis.com": {
+    "expression": "(destination.is_registered == false) && (destination.unregistered.host in ['agentregistry.googleapis.com', 'logging.googleapis.com', 'logging.mtls.googleapis.com', 'telemetry.googleapis.com', 'telemetry.mtls.googleapis.com', 'cloudtrace.googleapis.com', 'cloudtrace.mtls.googleapis.com', 'monitoring.googleapis.com', 'monitoring.mtls.googleapis.com', 'secretmanager.googleapis.com'])"
+   }
+  }
+ },
+ {
+  "description": "RM Agent -> essential Agent Platform hosts (2/2, ${REGION})",
+  "effect": "ALLOW",
+  "principals": [
+   "${AGENT_PRINCIPAL}"
+  ],
+  "operation": {
+   "permissions": [
+    "iap.googleapis.com/resources.egressViaIAP"
+   ]
+  },
+  "conditions": {
+   "iap.googleapis.com": {
+    "expression": "(destination.is_registered == false) && (destination.unregistered.host in ['secretmanager.mtls.googleapis.com', 'cloudresourcemanager.googleapis.com', 'cloudresourcemanager.mtls.googleapis.com', 'iamcredentials.googleapis.com', 'iamcredentials.mtls.googleapis.com', 'aiplatform.googleapis.com', 'aiplatform.mtls.googleapis.com', '${REGION}-aiplatform.googleapis.com', '${REGION}-aiplatform.mtls.googleapis.com', 'aiplatform.${REGION}.rep.googleapis.com'])"
+   }
+  }
+ },
+ {
+  "description": "RM Agent -> BigQuery API (scenario 8: data access then decided by IAM on the agent principal)",
+  "effect": "ALLOW",
+  "principals": [
+   "${AGENT_PRINCIPAL}"
+  ],
+  "operation": {
+   "permissions": [
+    "iap.googleapis.com/resources.egressViaIAP"
+   ]
+  },
+  "conditions": {
+   "iap.googleapis.com": {
+    "expression": "(destination.is_registered == false) && (destination.unregistered.host in ['bigquery.googleapis.com', 'bigquery.mtls.googleapis.com'])"
+   }
+  }
+ }
+]

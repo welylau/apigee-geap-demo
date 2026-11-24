@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Unexpected fault inside the extension processor: sanitized 500 (no policy names). -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Deny-Error">
+    <Set>
+        <Headers>
+            <Header name="Content-Type">application/json</Header>
+            <Header name="x-cymbal-decided-by">apigee-extproc</Header>
+            <Header name="x-cymbal-policy">extproc-error</Header>
+        </Headers>
+        <Payload contentType="application/json">{"error":{"decided_by":"apigee-extproc","policy":"extproc-error","message":"Authorization extension error."}}</Payload>
+        <StatusCode>500</StatusCode>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

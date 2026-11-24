@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Error flow (proxy and target): sanitized Google-style error, upstream bodies never relayed. -->
+<Javascript continueOnError="true" enabled="true" name="JS-Build-Error" timeLimit="200">
+    <IncludeURL>jsc://llm-lib.js</IncludeURL>
+    <ResourceURL>jsc://build-error.js</ResourceURL>
+</Javascript>

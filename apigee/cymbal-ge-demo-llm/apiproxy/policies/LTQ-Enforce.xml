@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- apigee-x-ai-gateway token-quota.md template. Limit/interval/unit come from the API product
+     (llmQuota, llmQuotaInterval, llmQuotaTimeUnit); inline values are fallback literals only.
+     Both halves share SharedName, Identifier (verified app) and LLMModelSource (backend model id). -->
+<LLMTokenQuota continueOnError="false" enabled="true" name="LTQ-Enforce" type="rollingwindow">
+    <SharedName>cymbal-ge-demo-llm-tokens</SharedName>
+    <EnforceOnly>true</EnforceOnly>
+    <Allow count="1" countRef="verifyapikey.VA-VerifyKey.apiproduct.developer.llmQuota.limit"/>
+    <Interval ref="verifyapikey.VA-VerifyKey.apiproduct.developer.llmQuota.interval">5</Interval>
+    <TimeUnit ref="verifyapikey.VA-VerifyKey.apiproduct.developer.llmQuota.timeunit">minute</TimeUnit>
+    <Identifier ref="verifyapikey.VA-VerifyKey.client_id"/>
+    <Distributed>true</Distributed>
+    <Synchronous>true</Synchronous>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <LLMModelSource>{ai.upstream_model}</LLMModelSource>
+</LLMTokenQuota>

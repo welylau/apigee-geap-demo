@@ -1,0 +1,25 @@
+# Model Armor CONTENT_AUTHZ policy scoped to MCP traffic only:
+#   - Apigee banking MCP        (host ${APIGEE_HOST}, path prefix /${PREFIX}/mcp/)
+#   - Credit Bureau MCP via Apigee (host ${APIGEE_HOST}, path prefix /${PREFIX}/bureau/)
+# LLM calls (/${PREFIX}/llm/...), platform APIs and telemetry are NOT sent to
+# Model Armor (the gateway's MA integration only parses MCP / A2A / OpenAI
+# payloads anyway; see configure-model-armor.md "Supported payloads").
+# Within one rule the operation fields AND together; operations OR together.
+name: ${MA_POLICY}
+target:
+  resources:
+    - "${AGW_RESOURCE}"
+policyProfile: CONTENT_AUTHZ
+action: CUSTOM
+customProvider:
+  authzExtension:
+    resources:
+      - "projects/${PROJECT_ID}/locations/${REGION}/authzExtensions/${MA_EXT}"
+httpRules:
+  - to:
+      operations:
+        - hosts:
+            - exact: "${APIGEE_HOST}"
+          paths:   # a path list ORs its entries
+            - prefix: "/${PREFIX}/mcp/"
+            - prefix: "/${PREFIX}/bureau/"

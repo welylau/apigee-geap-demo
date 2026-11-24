@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Apigee decision: product allowed_tools, user_token_required, end-user scope and transfer limit. -->
+<Javascript continueOnError="false" enabled="true" name="JS-Mcp-Authorize" timeLimit="200">
+    <IncludeURL>jsc://mcp-lib.js</IncludeURL>
+    <ResourceURL>jsc://mcp-authorize.js</ResourceURL>
+</Javascript>

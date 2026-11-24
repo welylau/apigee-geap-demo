@@ -1,0 +1,11 @@
+# IAP REQUEST_AUTHZ extension in ENFORCED mode (UAP / IAP policy version V2).
+# Created as a separate extension and swapped into the policy by
+# 02b-enforce-iap.sh (pattern used by the official egress codelab), so the
+# dry-run extension stays available for a quick rollback.
+name: ${IAP_EXT_ENFORCED}
+service: iap.googleapis.com
+failOpen: false
+timeout: 1s
+metadata:
+  iapPolicyVersion: "V2"
+  iamEnforcementMode: "ENFORCED"

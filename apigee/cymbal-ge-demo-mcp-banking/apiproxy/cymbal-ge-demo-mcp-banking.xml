@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy name="cymbal-ge-demo-mcp-banking" revision="1">
+    <DisplayName>cymbal-ge-demo-mcp-banking</DisplayName>
+    <Description>Cymbal Bank core-banking MCP server (Streamable HTTP, JSON responses) implemented in Apigee: API-product tool filtering (allowed_tools), end-user JWT scope and transfer-limit checks, product quota. Mock data, no target.</Description>
+    <BasePaths>/cymbal-ge-demo/mcp/banking</BasePaths>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+</APIProxy>

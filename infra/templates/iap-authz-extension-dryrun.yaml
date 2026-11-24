@@ -1,0 +1,9 @@
+# IAP REQUEST_AUTHZ extension in AUDIT-ONLY mode (UAP / IAP policy version V2).
+# Ref: set-up-agent-gateway.md step 3.1, delegate-authorization.md "Delegate authorization to IAP"
+name: ${IAP_EXT_DRYRUN}
+service: iap.googleapis.com
+failOpen: false
+timeout: 1s
+metadata:
+  iapPolicyVersion: "V2"
+  iamEnforcementMode: "DRY_RUN"

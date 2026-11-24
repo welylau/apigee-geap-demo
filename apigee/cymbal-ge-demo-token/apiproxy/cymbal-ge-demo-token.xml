@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy name="cymbal-ge-demo-token" revision="1">
+    <DisplayName>cymbal-ge-demo-token</DisplayName>
+    <Description>Cymbal Bank demo identity facade: mints short-lived HS256 user JWTs (rm-alice, teller-bob) for the web UI BFF. Secret lives in the encrypted KVM cymbal-ge-demo-kvm, never in this bundle.</Description>
+    <BasePaths>/cymbal-ge-demo/token</BasePaths>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+</APIProxy>

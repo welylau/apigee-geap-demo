@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- KVM entry jwt-hs256-secret missing: fail closed with a generic 500. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Reject-Config">
+    <AssignVariable>
+        <Name>cymbal.reject</Name>
+        <Value>config-missing</Value>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

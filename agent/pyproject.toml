@@ -1,0 +1,17 @@
+[project]
+name = "cymbal-ge-demo-rm-agent"
+version = "0.1.0"
+description = "RM Agent (Cymbal Bank relationship-manager assistant) for Agent Runtime, governed by Agent Gateway + Apigee"
+requires-python = ">=3.11,<3.14"
+# Pinned for reproducible Agent Runtime builds (deploy.py ships the same pins
+# as `requirements`). Tools themselves use only the stdlib (urllib) on purpose.
+dependencies = [
+    "google-adk==2.14.1",
+    "google-cloud-aiplatform[agent_engines,adk]==2.9.0",
+    # match the Agent Runtime base image (see requirements.txt)
+    "opentelemetry-api==1.42.1",
+    "opentelemetry-sdk==1.42.1",
+]
+
+[tool.uv]
+package = false

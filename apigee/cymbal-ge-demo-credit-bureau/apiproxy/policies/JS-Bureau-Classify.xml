@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Reads (never rewrites) the JSON-RPC request: bureau.paid = true only for tools/call. -->
+<Javascript continueOnError="false" enabled="true" name="JS-Bureau-Classify" timeLimit="200">
+    <IncludeURL>jsc://bureau-lib.js</IncludeURL>
+    <ResourceURL>jsc://bureau-classify.js</ResourceURL>
+</Javascript>

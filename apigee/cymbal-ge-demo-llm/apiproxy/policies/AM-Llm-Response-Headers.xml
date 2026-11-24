@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- DESIGN.md response headers. Counter identities and credentials are never exposed. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Llm-Response-Headers">
+    <Remove>
+        <Headers>
+            <Header name="Set-Cookie"/>
+        </Headers>
+    </Remove>
+    <Set>
+        <Headers>
+            <Header name="Cache-Control">no-store</Header>
+            <Header name="x-cymbal-decided-by">apigee</Header>
+            <Header name="x-cymbal-policy">{ai.policy}</Header>
+            <Header name="x-cymbal-model">{ai.upstream_model}</Header>
+            <Header name="x-cymbal-route">{ai.route}</Header>
+            <Header name="x-cymbal-tokens-used">{ai.usage.total}</Header>
+        </Headers>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

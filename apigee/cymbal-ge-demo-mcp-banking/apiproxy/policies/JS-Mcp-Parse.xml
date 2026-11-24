@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Parses one JSON-RPC 2.0 message into mcp.* variables. -->
+<Javascript continueOnError="false" enabled="true" name="JS-Mcp-Parse" timeLimit="200">
+    <IncludeURL>jsc://mcp-lib.js</IncludeURL>
+    <ResourceURL>jsc://mcp-parse.js</ResourceURL>
+</Javascript>

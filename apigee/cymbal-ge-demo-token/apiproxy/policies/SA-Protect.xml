@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Per-app burst protection for the token endpoint (demo traffic is a handful of calls). -->
+<SpikeArrest continueOnError="false" enabled="true" name="SA-Protect">
+    <Rate>60pm</Rate>
+    <Identifier ref="verifyapikey.VA-VerifyKey.client_id"/>
+    <UseEffectiveCount>true</UseEffectiveCount>
+</SpikeArrest>

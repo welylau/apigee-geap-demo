@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Caller credential -> API product (cymbal-ge-demo-internal-agent or cymbal-ge-demo-partner).
+     Product custom attributes read later: allowed_tools, user_token_required. -->
+<VerifyAPIKey continueOnError="false" enabled="true" name="VA-VerifyKey">
+    <APIKey ref="request.header.x-api-key"/>
+</VerifyAPIKey>

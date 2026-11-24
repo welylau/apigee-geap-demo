@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Plan quota for tools/call, read from the caller's API product (partner 5/min -> S7, internal 600/min).
+     rollingwindow so 6 rapid calls always see the 6th rejected (no minute-boundary reset mid-demo).
+     DefaultConfig is used only if the product carries no quota. -->
+<Quota continueOnError="false" enabled="true" name="Q-Product-Quota" type="rollingwindow">
+    <Identifier ref="verifyapikey.VA-VerifyKey.client_id"/>
+    <UseQuotaConfigInAPIProduct stepName="VA-VerifyKey">
+        <DefaultConfig>
+            <Allow>5</Allow>
+            <Interval>1</Interval>
+            <TimeUnit>minute</TimeUnit>
+        </DefaultConfig>
+    </UseQuotaConfigInAPIProduct>
+    <Distributed>true</Distributed>
+    <Synchronous>true</Synchronous>
+</Quota>

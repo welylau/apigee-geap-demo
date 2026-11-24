@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Runs the authorized call on mock core-banking data (no target). -->
+<Javascript continueOnError="false" enabled="true" name="JS-Mcp-Respond" timeLimit="200">
+    <IncludeURL>jsc://mcp-lib.js</IncludeURL>
+    <ResourceURL>jsc://mcp-respond.js</ResourceURL>
+</Javascript>

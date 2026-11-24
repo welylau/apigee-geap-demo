@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Path validation, streaming rejection, model allowlist and cymbal-auto routing -> ai.upstream_model. -->
+<Javascript continueOnError="false" enabled="true" name="JS-Llm-Route" timeLimit="200">
+    <IncludeURL>jsc://llm-lib.js</IncludeURL>
+    <ResourceURL>jsc://llm-route.js</ResourceURL>
+</Javascript>

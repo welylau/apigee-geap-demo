@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- RM Agent key -> cymbal-ge-demo-internal-agent (the partner product does not include this proxy). -->
+<VerifyAPIKey continueOnError="false" enabled="true" name="VA-VerifyKey">
+    <APIKey ref="request.header.x-api-key"/>
+</VerifyAPIKey>

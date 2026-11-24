@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Strip every caller credential before the third party; exact /mcp URL from the property set; no path/query
+     copy. The request body is forwarded unchanged. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Prepare-Target">
+    <Remove>
+        <Headers>
+            <Header name="Authorization"/>
+            <Header name="x-api-key"/>
+            <Header name="x-user-token"/>
+            <Header name="x-goog-api-key"/>
+            <Header name="x-goog-user-project"/>
+            <Header name="Cookie"/>
+        </Headers>
+        <QueryParams/>
+    </Remove>
+    <Set>
+        <Headers>
+            <Header name="Content-Type">application/json</Header>
+            <Header name="Host">{propertyset.bureau.target_host}</Header>
+        </Headers>
+    </Set>
+    <AssignVariable>
+        <Name>target.copy.pathsuffix</Name>
+        <Value>false</Value>
+    </AssignVariable>
+    <AssignVariable>
+        <Name>target.copy.queryparams</Name>
+        <Value>false</Value>
+    </AssignVariable>
+    <AssignVariable>
+        <Name>target.url</Name>
+        <Ref>propertyset.bureau.target_url</Ref>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  cymbal-ge-demo-extproc (env cymbal-ge-demo-extproc, envgroup host apigee-extproc.cymbal-ge-demo.internal)
+  Invoked by Agent Gateway through AuthzExtension cymbal-ge-demo-apigee-authz
+  (metadata apigee-extension-processor: cymbal-ge-demo-extproc, apigee-request-body: 'true').
+  No target: Apigee returns only allow / deny, the gateway forwards the original request.
+
+  Scope inside the proxy (extension-processor-policies.md "Scope the traffic you process"):
+    JS-Extproc-Classify sets cymbal.cb_governed / cymbal.cb_count / cymbal.quota_key.
+    Q-Credit-Bureau runs ONLY when cymbal.cb_count = "true" (paid lookup to the credit-bureau host).
+  Deny: QuotaViolation -> AM-Deny-Quota = 429 + {"error":{"decided_by":"apigee-extproc","policy":"credit-bureau-quota",...}}
+  Nothing runs on the response events. No MessageLogging/ServiceCallout/GenerateJWT (unsupported in ext-proc).
+-->
+<ProxyEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>JS-Extproc-Classify</Name>
+            </Step>
+            <Step>
+                <Name>Q-Credit-Bureau</Name>
+                <Condition>cymbal.cb_count = "true"</Condition>
+            </Step>
+        </Request>
+        <Response/>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <FaultRules>
+        <FaultRule name="credit-bureau-quota">
+            <Condition>(fault.name = "QuotaViolation") or (ratelimit.Q-Credit-Bureau.failed = true)</Condition>
+            <Step>
+                <Name>AM-Deny-Quota</Name>
+            </Step>
+        </FaultRule>
+    </FaultRules>
+    <DefaultFaultRule name="default">
+        <AlwaysEnforce>false</AlwaysEnforce>
+        <Step>
+            <Name>AM-Deny-Error</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPProxyConnection>
+        <BasePath>/</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="no-target"/>
+</ProxyEndpoint>

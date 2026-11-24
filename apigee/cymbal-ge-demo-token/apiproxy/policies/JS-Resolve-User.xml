@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Javascript continueOnError="false" enabled="true" name="JS-Resolve-User" timeLimit="200">
+    <ResourceURL>jsc://resolve-user.js</ResourceURL>
+</Javascript>

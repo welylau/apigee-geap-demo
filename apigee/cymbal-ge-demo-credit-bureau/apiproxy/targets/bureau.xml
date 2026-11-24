@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Cloud Run credit bureau (mock third party; NOT publicly invokable). Apigee authenticates with a Google ID token
+  minted for the deployment SA (sa-apigee-aiservices, granted roles/run.invoker by setup-apigee.sh); the audience is
+  the canonical service URL (propertyset.bureau.audience, literal fallback below).
+  AM-Prepare-Target strips caller credentials (incl. Authorization, replaced by the ID token) and sets the
+  exact operation URL from the property set (target.copy.pathsuffix=false in THIS request flow).
+  success.codes includes 4xx so bureau client errors pass through unchanged; 5xx and transport failures raise
+  a fault here and are sanitized to 502 upstream-error. The URL below is a placeholder (target.url always wins).
+-->
+<TargetEndpoint name="bureau">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>AM-Prepare-Target</Name>
+            </Step>
+        </Request>
+        <Response/>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <DefaultFaultRule name="upstream">
+        <AlwaysEnforce>true</AlwaysEnforce>
+        <Step>
+            <Name>AM-Mark-Target-Fault</Name>
+        </Step>
+        <Step>
+            <Name>JS-Build-Error</Name>
+        </Step>
+        <Step>
+            <Name>AM-Error-Response</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPTargetConnection>
+        <Authentication>
+            <GoogleIDToken>
+                <Audience ref="propertyset.bureau.audience">https://cymbal-ge-demo-credit-bureau-YOUR_PROJECT_NUMBER.asia-southeast1.run.app</Audience>
+            </GoogleIDToken>
+        </Authentication>
+        <Properties>
+            <Property name="success.codes">1xx,2xx,3xx,4xx</Property>
+            <Property name="connect.timeout.millis">5000</Property>
+            <Property name="io.timeout.millis">30000</Property>
+        </Properties>
+        <URL>https://credit-bureau.invalid/mcp</URL>
+    </HTTPTargetConnection>
+</TargetEndpoint>

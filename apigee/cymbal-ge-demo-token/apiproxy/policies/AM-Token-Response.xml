@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-Token-Response">
+    <Set>
+        <Headers>
+            <Header name="Cache-Control">no-store</Header>
+            <Header name="x-cymbal-decided-by">apigee</Header>
+            <Header name="x-cymbal-policy">token-issued</Header>
+        </Headers>
+        <Payload contentType="application/json">{"access_token":"{cymbal.jwt}","token_type":"Bearer","expires_in":900,"user":"{cymbal.sub}","role":"{cymbal.role}","actor":"{cymbal.actor}","act_client":"{cymbal.act_client}"}</Payload>
+        <StatusCode>200</StatusCode>
+    </Set>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

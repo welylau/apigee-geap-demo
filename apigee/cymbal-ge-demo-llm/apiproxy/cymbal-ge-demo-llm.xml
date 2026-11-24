@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy name="cymbal-ge-demo-llm" revision="1">
+    <DisplayName>cymbal-ge-demo-llm</DisplayName>
+    <Description>Cymbal Bank LLM gateway: Vertex AI generateContent passthrough with the cymbal-auto routing alias, model allowlist, per-app LLMTokenQuota budget from the API product, caller credentials stripped, GoogleAccessToken to Vertex (global). Non-streaming only.</Description>
+    <BasePaths>/cymbal-ge-demo/llm</BasePaths>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+    <TargetEndpoints>
+        <TargetEndpoint>vertex</TargetEndpoint>
+    </TargetEndpoints>
+</APIProxy>

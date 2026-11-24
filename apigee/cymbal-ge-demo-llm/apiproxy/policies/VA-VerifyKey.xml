@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Caller credential: app on cymbal-ge-demo-internal-agent. The product also carries llmQuota* and
+     the llmOperationGroup read by LTQ-Enforce / LTQ-Count through this policy name. -->
+<VerifyAPIKey continueOnError="false" enabled="true" name="VA-VerifyKey">
+    <APIKey ref="request.header.x-api-key"/>
+</VerifyAPIKey>

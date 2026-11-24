@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Lets JS-Build-Error classify the fault as an upstream (Vertex) error. -->
+<AssignMessage continueOnError="false" enabled="true" name="AM-Mark-Target-Fault">
+    <AssignVariable>
+        <Name>cymbal.in_target</Name>
+        <Value>true</Value>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

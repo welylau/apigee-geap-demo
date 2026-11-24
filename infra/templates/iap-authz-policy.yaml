@@ -1,0 +1,13 @@
+# REQUEST_AUTHZ policy: every egress request is checked by IAP against the UAPs
+# bound to the project (agent identity -> registered destination).
+# ${IAP_EXT_ACTIVE} is either ${IAP_EXT_DRYRUN} (02) or ${IAP_EXT_ENFORCED} (02b).
+name: ${IAP_POLICY}
+target:
+  resources:
+    - "${AGW_RESOURCE}"
+policyProfile: REQUEST_AUTHZ
+action: CUSTOM
+customProvider:
+  authzExtension:
+    resources:
+      - "projects/${PROJECT_ID}/locations/${REGION}/authzExtensions/${IAP_EXT_ACTIVE}"

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!--
+  Architecture overview, revision 10 (Agents Meet APIs: Gemini Enterprise Agent Platform × Apigee).
+  Render: Chrome headless 1600x900 @2x -> docs/architecture-v10.png.
+  Rev 10: title now names Gemini Enterprise Agent Platform instead of Agent Gateway.
+  Rev 9: platform box starts higher; Agent Runtime wrapper around RM + Insights agents; Agent Identity box below
+  Agent Registry (LLM endpoint removed from the registry); Cloud Logging shows its name only.
+  Rev 8: Content check moved below Default deny, dotted connector from it to Model Armor; Model Armor pill removed.
+  Rev 7: fewer words. Every box description is 4 words or fewer; Example and Outcomes trimmed the same way;
+  arrow labels shortened. Layout unchanged from rev 6.
+  Rev 6: Model Garden styled as part of Gemini Enterprise Agent Platform (reached via Apigee's LLM gateway);
+  Model Armor split out as its own Google Cloud security service that Agent Gateway calls.
+  Rev 5: Agent Identity (Insights Agent, BigQuery via IAM, on-behalf-of tokens).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1a73e8; --blue-l: #e8f0fe;
+    --gblue: #4285f4; --gblue-d: #1967d2; --gblue-bg: #f6f9ff;
+    --orange: #f04d23; --orange-l: #fef3f0;
+    --green: #188038; --green-l: #e6f4ea;
+    --red: #c5221f; --red-l: #fce8e6;
+    --purple: #7b1fa2; --purple-l: #f3e8fd;
+    --amber: #b06000; --amber-l: #fef7e0;
+    --gray9: #202124; --gray7: #5f6368; --gray5: #9aa0a6; --gray3: #dadce0; --gray1: #f1f3f4;
+    --sans: "Plus Jakarta Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "JetBrains Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1600px; height: 900px; background: #fff; font-family: var(--sans); color: var(--gray9); position: relative; overflow: hidden; }
+
+  .head { position: absolute; left: 40px; top: 24px; }
+  .head h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; }
+  .head h1 .b { color: var(--blue); } .head h1 .o { color: var(--orange); }
+  .head p { font-size: 19px; color: var(--gray7); margin-top: 10px; font-weight: 600; line-height: 1.5; max-width: 1000px; white-space: nowrap; }
+  .head p b { font-weight: 800; }
+
+  .box { position: absolute; border: 3px solid var(--gray9); border-radius: 18px; background: #fff; padding: 14px 18px; z-index: 2; }
+  .name { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; line-height: 1.15; white-space: nowrap; }
+  .name img { width: 28px; height: 28px; object-fit: contain; }
+  .emoji { font-size: 22px; line-height: 1; }
+  .desc { font-size: 16px; color: var(--gray7); margin-top: 6px; line-height: 1.3; font-weight: 600; white-space: nowrap; }
+  .num { width: 30px; height: 30px; border-radius: 50%; color: #fff; font-weight: 800; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .tag { display: inline-block; margin-top: 8px; font-size: 14px; font-weight: 700; border-radius: 999px; padding: 3px 12px; }
+  .ptag { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; color: var(--gblue-d); letter-spacing: 0.2px; }
+  .ptag img { width: 16px; height: 16px; }
+
+  #geap { position: absolute; left: 28px; top: 160px; width: 764px; height: 474px; border: 3px solid var(--gblue); border-radius: 24px; background: var(--gblue-bg); z-index: 0; }
+  #geap .gtitle { position: absolute; left: 22px; top: 11px; font-size: 20px; font-weight: 800; color: var(--gblue-d); display: flex; align-items: center; gap: 10px; }
+  #geap .gtitle img { width: 28px; height: 28px; }
+
+  #governed { position: absolute; left: 386px; top: 240px; width: 846px; height: 382px; border: 3px dotted var(--gray5); border-radius: 22px; background: transparent; z-index: 1; }
+  #governed .glabel { position: absolute; right: 18px; bottom: -13px; background: #fff; padding: 0 8px; font-size: 14px; font-weight: 800; letter-spacing: 1px; color: var(--gray7); text-transform: uppercase; }
+
+  /* Agent Runtime: thin labelled wrapper around the two agents */
+  #runtime { position: absolute; left: 40px; top: 206px; width: 298px; height: 212px; border: 1.5px solid var(--gblue); border-radius: 16px; background: transparent; z-index: 1; }
+  #runtime .rlabel { position: absolute; left: 12px; top: 4px; font-size: 12.5px; font-weight: 800; letter-spacing: 1px; color: var(--gblue-d); text-transform: uppercase; }
+
+  #client { left: 50px; top: 228px; width: 278px; height: 104px; border-color: var(--blue); padding: 9px 16px; }
+  #client .name { color: var(--blue); font-size: 23px; }
+  #client .desc { margin-top: 4px; }
+  #client .tag { color: var(--blue); background: var(--blue-l); margin-top: 6px; }
+  #insights { left: 50px; top: 340px; width: 278px; height: 70px; border-color: var(--red); border-style: dashed; padding: 9px 16px; }
+  #insights .name { color: var(--red); font-size: 21px; }
+  #insights .desc { margin-top: 4px; }
+
+  #registry { left: 40px; top: 428px; width: 298px; height: 98px; border-color: var(--gblue-d); padding: 9px 16px; }
+  #registry .name { color: var(--gblue-d); font-size: 22px; }
+  #registry ul { margin-top: 4px; padding-left: 20px; font-size: 16px; color: var(--gray7); font-weight: 600; line-height: 1.45; }
+
+  #identity { left: 40px; top: 536px; width: 298px; height: 76px; border-color: var(--gblue-d); padding: 9px 16px; }
+  #identity .name { color: var(--gblue-d); font-size: 22px; }
+  #identity .desc { margin-top: 4px; }
+
+  #agw { left: 406px; top: 262px; width: 364px; height: 344px; border-color: var(--blue); padding: 14px 18px; }
+  #agw .name { color: var(--blue); font-size: 24px; }
+  #agw .num { background: var(--blue); width: 32px; height: 32px; font-size: 17px; }
+  .chips { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .chip { border: 2px solid var(--blue); border-radius: 12px; padding: 9px 14px; background: var(--blue-l); }
+  .chip b { display: block; font-size: 17px; font-weight: 800; color: var(--blue); }
+  .chip span { font-size: 15px; color: var(--gray7); font-weight: 600; }
+  .chip.callout { border-style: dashed; border-color: var(--amber); background: var(--amber-l); }
+  .chip.callout b { color: var(--amber); }
+
+  #apigee { left: 832px; top: 262px; width: 380px; height: 344px; border-color: var(--orange); padding: 14px 18px; }
+  #apigee .name { color: var(--orange); font-size: 24px; }
+  #apigee .num { background: var(--orange); width: 32px; height: 32px; font-size: 17px; }
+  #apigee ul { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  #apigee li { border: 2px solid var(--orange); border-radius: 12px; padding: 9px 14px; background: var(--orange-l); }
+  #apigee li b { display: block; font-size: 17px; font-weight: 800; color: var(--orange); }
+  #apigee li span { font-size: 15px; color: var(--gray7); font-weight: 600; }
+
+  #partner { left: 832px; top: 128px; width: 300px; height: 86px; border-color: var(--orange); border-style: dashed; padding: 12px 16px; }
+  #partner .name { color: var(--orange); font-size: 22px; }
+
+  #tools { left: 1300px; top: 262px; width: 260px; height: 76px; border-color: var(--green); padding: 10px 16px; }
+  #tools .name { color: var(--green); font-size: 21px; }
+  #models { left: 1300px; top: 346px; width: 260px; height: 100px; border-color: var(--gblue); background: var(--gblue-bg); padding: 9px 16px; }
+  #models .name { color: var(--gblue-d); font-size: 21px; margin-top: 5px; }
+  #thirdparty { left: 1300px; top: 454px; width: 260px; height: 76px; border-color: var(--gray7); border-style: dashed; background: var(--gray1); padding: 10px 16px; }
+  #thirdparty .name { color: var(--gray9); font-size: 21px; }
+  #thirdparty .num { background: var(--gray7); width: 26px; height: 26px; font-size: 14px; }
+  #bq { left: 1300px; top: 538px; width: 260px; height: 82px; border-color: var(--red); background: var(--red-l); padding: 12px 16px; }
+  #bq .name { color: var(--red); font-size: 21px; }
+  #tools .desc, #models .desc, #thirdparty .desc, #bq .desc { margin-top: 4px; }
+
+  #armor { left: 444px; top: 648px; width: 240px; height: 62px; border-color: var(--amber); background: var(--amber-l); padding: 7px 14px; }
+  #armor .name { color: var(--amber); font-size: 20px; }
+  #armor .name small { font-size: 12.5px; font-weight: 800; color: var(--amber); background: #fff; border: 1.5px solid var(--amber); border-radius: 999px; padding: 1px 8px; }
+  #armor .desc { margin-top: 2px; font-size: 15px; }
+
+  #log { left: 1300px; top: 140px; width: 260px; height: 62px; border-color: var(--purple); background: var(--purple-l); padding: 14px 18px; }
+  #log .name { color: var(--purple); font-size: 22px; }
+
+  .panel { position: absolute; top: 722px; height: 168px; border: 2px dashed var(--gray3); background: var(--gray1); border-radius: 18px; padding: 14px 24px; }
+  .panel .lbl { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: var(--gray7); }
+  #example { left: 28px; width: 560px; }
+  #example .row { font-family: var(--mono); font-size: 18px; margin-top: 12px; display: flex; gap: 14px; align-items: baseline; }
+  #example .row b { font-family: var(--sans); font-size: 16px; width: 64px; flex: none; }
+  .tok { color: var(--red); background: var(--red-l); border-radius: 6px; padding: 1px 8px; font-weight: 700; }
+  #outcomes { left: 616px; width: 944px; }
+  #outcomes .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 10px; margin-top: 12px; }
+  .out { display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 600; white-space: nowrap; }
+  .code { font-family: var(--mono); font-weight: 700; font-size: 16px; border-radius: 8px; padding: 1px 10px; min-width: 58px; text-align: center; }
+  .ok { color: var(--green); background: var(--green-l); }
+  .no { color: var(--red); background: var(--red-l); }
+  .who-b { color: var(--blue); font-weight: 800; } .who-o { color: var(--orange); font-weight: 800; } .who-r { color: var(--red); font-weight: 800; }
+
+  .lab { position: absolute; z-index: 6; font-size: 14px; font-weight: 700; background: #fff; padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
+  svg { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Agents Meet APIs: <span class="b">Gemini Enterprise Agent Platform</span> × <span class="o">Apigee</span></h1>
+  <p><b style="color:#1a73e8">Agent Gateway</b>: where agents go. <b style="color:#f04d23">Apigee</b>: which APIs, for whom, how much. <b style="color:#c5221f">IAM</b>: which data.</p>
+</div>
+
+<div id="geap"><div class="gtitle"><img src="../web-ui/static/assets/google-cloud.png" alt="">Gemini Enterprise Agent Platform</div></div>
+<div id="governed"><div class="glabel">Governed agent traffic</div></div>
+
+<svg width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="mB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1a73e8"/></marker>
+    <marker id="mD" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1967d2"/></marker>
+    <marker id="mG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#188038"/></marker>
+    <marker id="mO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f04d23"/></marker>
+    <marker id="mR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c5221f"/></marker>
+    <marker id="mP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b1fa2"/></marker>
+    <marker id="mA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b06000"/></marker>
+  </defs>
+  <line x1="342" y1="268" x2="398" y2="268" stroke="#1a73e8" stroke-width="4" marker-end="url(#mB)"/>
+  <line x1="402" y1="300" x2="346" y2="300" stroke="#188038" stroke-width="4" stroke-dasharray="8 5" marker-end="url(#mG)"/>
+  <line x1="342" y1="376" x2="398" y2="376" stroke="#c5221f" stroke-width="4" stroke-dasharray="6 5" marker-end="url(#mR)"/>
+  <line x1="346" y1="476" x2="398" y2="476" stroke="#1967d2" stroke-width="4" marker-start="url(#mD)" marker-end="url(#mD)"/>
+  <line x1="346" y1="574" x2="398" y2="574" stroke="#1967d2" stroke-width="4" marker-start="url(#mD)" marker-end="url(#mD)"/>
+  <line x1="774" y1="384" x2="824" y2="384" stroke="#1a73e8" stroke-width="4" marker-end="url(#mB)"/>
+  <line x1="828" y1="452" x2="778" y2="452" stroke="#188038" stroke-width="4" stroke-dasharray="9 6" marker-end="url(#mG)"/>
+  <line x1="1216" y1="288" x2="1292" y2="288" stroke="#1a73e8" stroke-width="4" marker-end="url(#mB)"/>
+  <line x1="1296" y1="316" x2="1220" y2="316" stroke="#188038" stroke-width="4" stroke-dasharray="8 5" marker-end="url(#mG)"/>
+  <line x1="1216" y1="384" x2="1292" y2="384" stroke="#1a73e8" stroke-width="4" marker-end="url(#mB)"/>
+  <line x1="1296" y1="412" x2="1220" y2="412" stroke="#188038" stroke-width="4" stroke-dasharray="8 5" marker-end="url(#mG)"/>
+  <line x1="1216" y1="496" x2="1292" y2="496" stroke="#f04d23" stroke-width="4" marker-end="url(#mO)"/>
+  <line x1="564" y1="550" x2="564" y2="642" stroke="#b06000" stroke-width="4" stroke-dasharray="3 6" stroke-linecap="round" marker-start="url(#mA)" marker-end="url(#mA)"/>
+  <polyline points="744,610 744,678 1430,678 1430,626" fill="none" stroke="#c5221f" stroke-width="4" marker-end="url(#mR)"/>
+  <line x1="982" y1="218" x2="982" y2="254" stroke="#f04d23" stroke-width="4" stroke-dasharray="7 5" marker-end="url(#mO)"/>
+  <polyline points="1198,258 1198,171 1292,171" fill="none" stroke="#7b1fa2" stroke-width="4" stroke-dasharray="9 6" marker-end="url(#mP)"/>
+</svg>
+
+<div class="lab" style="left:346px; top:238px; color:#1a73e8;">calls</div>
+<div class="lab" style="left:340px; top:306px; color:#188038;">answer</div>
+<div class="lab" style="left:354px; top:384px; color:#c5221f;">403</div>
+<div class="lab" style="left:342px; top:444px; color:#1967d2;">lookup</div>
+<div class="lab" style="left:346px; top:542px; color:#1967d2;">verify</div>
+<div class="lab" style="left:1224px; top:260px; color:#1a73e8;">allowed</div>
+<div class="lab" style="left:1228px; top:322px; color:#188038;">result</div>
+<div class="lab" style="left:1224px; top:356px; color:#1a73e8;">routed</div>
+<div class="lab" style="left:1228px; top:418px; color:#188038;">tokens</div>
+<div class="lab" style="left:1220px; top:468px; color:#f04d23;">metered</div>
+<div class="lab" style="left:574px; top:614px; color:#b06000;">verdict</div>
+<div class="lab" style="left:1010px; top:668px; color:#c5221f;">agent identity → IAM</div>
+<div class="lab" style="left:992px; top:224px; color:#f04d23;">Apigee only</div>
+<div class="lab" style="left:1212px; top:139px; color:#7b1fa2;">audit</div>
+
+<div id="runtime"><div class="rlabel">Agent Runtime</div></div>
+
+<div class="box" id="client">
+  <div class="name"><span class="emoji">🤖</span>RM Agent</div>
+  <div class="desc">Acts for bank users</div>
+  <span class="tag">Identity #1</span>
+</div>
+
+<div class="box" id="insights">
+  <div class="name"><span class="emoji">📈</span>Insights Agent</div>
+  <div class="desc">Identity #2, not allowed</div>
+</div>
+
+<div class="box" id="registry">
+  <div class="name">🗂️ Agent Registry</div>
+  <ul><li>Banking MCP</li><li>Credit bureau MCP</li></ul>
+</div>
+
+<div class="box" id="identity">
+  <div class="name">🪪 Agent Identity</div>
+  <div class="desc">One principal per agent</div>
+</div>
+
+<div class="box" id="agw">
+  <div class="name"><span class="num">1</span>Agent Gateway</div>
+  <div class="chips">
+    <div class="chip"><b>IAM access policies</b><span>Per-agent allow rules</span></div>
+    <div class="chip"><b>Default deny</b><span>Unregistered is blocked</span></div>
+    <div class="chip callout"><b>Content check</b><span>Calls Model Armor</span></div>
+  </div>
+</div>
+
+<div class="box" id="apigee">
+  <div class="name"><span class="num">2</span><img src="../web-ui/static/assets/apigee-logo.svg" alt="">Apigee X</div>
+  <ul>
+    <li><b>MCP tools</b><span>On-behalf-of user tokens</span></li>
+    <li><b>LLM gateway</b><span>Routing, token budget</span></li>
+    <li><b>Paid-API quota</b><span>Meters 3rd-party calls</span></li>
+  </ul>
+</div>
+
+<div class="box" id="partner">
+  <div class="name"><span class="emoji">🤝</span>FinPal agent</div>
+  <div class="desc">External partner, own key</div>
+</div>
+
+<div class="box" id="tools">
+  <div class="name"><span class="emoji">🏦</span>Tools</div>
+  <div class="desc">Core banking MCP</div>
+</div>
+
+<div class="box" id="models">
+  <div class="ptag"><img src="../web-ui/static/assets/google-cloud.png" alt="">Agent Platform</div>
+  <div class="name"><span class="emoji">✨</span>Model Garden</div>
+  <div class="desc">Gemini models</div>
+</div>
+
+<div class="box" id="thirdparty">
+  <div class="name"><span class="num">3</span>3rd-party API</div>
+  <div class="desc">Paid credit bureau</div>
+</div>
+
+<div class="box" id="bq">
+  <div class="name"><span class="emoji">🗄️</span>BigQuery</div>
+  <div class="desc">KYC granted, HR denied</div>
+</div>
+
+<div class="box" id="armor">
+  <div class="name"><span class="emoji">🛡️</span>Model Armor</div>
+  <div class="desc">Detects prompt injection</div>
+</div>
+
+<div class="box" id="log">
+  <div class="name">Cloud Logging</div>
+</div>
+
+<div class="panel" id="example">
+  <div class="lbl">EXAMPLE · Bob the teller</div>
+  <div class="row"><b>Asks</b><span>transfer SGD 50k</span></div>
+  <div class="row"><b>Token</b><span>sub=bob · act=RM Agent</span></div>
+  <div class="row"><b>Result</b><span><span class="tok">403 · over Bob's limit</span></span></div>
+</div>
+
+<div class="panel" id="outcomes">
+  <div class="lbl">OUTCOMES · WHO DECIDED</div>
+  <div class="grid">
+    <div class="out"><span class="code ok">200</span>Both layers allow</div>
+    <div class="out"><span class="code no">403</span><span><span class="who-o">Apigee:</span> tool, token, user limit</span></div>
+    <div class="out"><span class="code no">403</span><span><span class="who-b">Agent Gateway:</span> destination, identity, content</span></div>
+    <div class="out"><span class="code no">429</span><span><span class="who-o">Apigee:</span> quota exceeded</span></div>
+    <div class="out"><span class="code no">403</span><span><span class="who-r">IAM:</span> no data grant</span></div>
+  </div>
+</div>
+
+</body>
+</html>

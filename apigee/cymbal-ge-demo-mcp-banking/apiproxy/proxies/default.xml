@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  cymbal-ge-demo-mcp-banking   POST /cymbal-ge-demo/mcp/banking   (MCP Streamable HTTP, JSON only, no SSE)
+  Methods: initialize, notifications/* (202), ping, tools/list (filtered), tools/call.
+
+  Request pipeline (PreFlow):
+    1. method guard (POST only)                       -> 405 method-not-allowed
+    2. JS-Mcp-Parse: one JSON-RPC 2.0 object          -> 400 parse-error / invalid-request / invalid-params
+    3. VA-VerifyKey (x-api-key -> API product)        -> 401 invalid-api-key
+    4. SA-Protect: per-app burst guard                -> 429 rate-limited
+    5. if x-user-token present: KVM secret + VerifyJWT (HS256, iss/aud/exp) -> 401 user-token-invalid
+    6. JS-Mcp-Authorize: product attribute allowed_tools, user_token_required, user scope, transfer limit
+                                                       -> 403 tool-not-in-product / user-scope-missing /
+                                                          user-transfer-limit, 401 user-token-required
+    7. Q-Product-Quota on tools/call only (limit from the API product)  -> 429 product-quota
+  Response: JS-Mcp-Respond runs the mock tool and sets x-cymbal-decided-by / x-cymbal-policy.
+  Errors: DefaultFaultRule (AlwaysEnforce) -> JS-Build-Error + AM-Error-Response (JSON-RPC error shape).
+-->
+<ProxyEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>AM-Reject-Method</Name>
+                <Condition>request.verb != "POST"</Condition>
+            </Step>
+            <Step>
+                <Name>AM-Reject-NotFound</Name>
+                <Condition>(proxy.pathsuffix != null) and (proxy.pathsuffix != "") and (proxy.pathsuffix != "/")</Condition>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>JS-Mcp-Parse</Name>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>VA-VerifyKey</Name>
+            </Step>
+            <Step>
+                <Name>SA-Protect</Name>
+            </Step>
+            <Step>
+                <Name>KVM-Get-JwtSecret</Name>
+                <Condition>(request.header.x-user-token != null) and (request.header.x-user-token != "")</Condition>
+            </Step>
+            <Step>
+                <Name>JWT-Verify-UserToken</Name>
+                <Condition>(request.header.x-user-token != null) and (request.header.x-user-token != "")</Condition>
+            </Step>
+            <Step>
+                <Name>JS-Mcp-Authorize</Name>
+            </Step>
+            <Step>
+                <Name>RF-Reject</Name>
+                <Condition>cymbal.reject != null</Condition>
+            </Step>
+            <Step>
+                <Name>Q-Product-Quota</Name>
+                <Condition>mcp.method = "tools/call"</Condition>
+            </Step>
+        </Request>
+        <Response>
+            <Step>
+                <Name>JS-Mcp-Respond</Name>
+            </Step>
+        </Response>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <DefaultFaultRule name="default">
+        <AlwaysEnforce>true</AlwaysEnforce>
+        <Step>
+            <Name>JS-Build-Error</Name>
+        </Step>
+        <Step>
+            <Name>AM-Error-Response</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPProxyConnection>
+        <BasePath>/cymbal-ge-demo/mcp/banking</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="no-target"/>
+</ProxyEndpoint>

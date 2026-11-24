@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apigee X — Agents Meet APIs: Gemini Enterprise Agent Platform × Apigee</title>
+  <!-- House favicon: multicolour Apigee mark (same URL as token.YOUR_DOMAIN / SMR). Don't swap for emoji. -->
+  <link rel="icon" type="image/svg+xml" href="https://www.gstatic.com/bricks/image/b45728f17bf88494b25d78a9fb27ae538e6eb4a06a972f6502b7410ff714532d.svg">
+
+  <!-- Fonts: Plus Jakarta Sans & JetBrains Mono (house style; do not swap) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="tour/tour.css">
+
+  <!-- app.js is loaded synchronously in <head> so the saved theme applies before first paint;
+       it defers all DOM wiring to DOMContentLoaded. -->
+  <script src="app.js"></script>
+</head>
+<body data-demo="geap-apigee-demo">
+  <div class="app-container">
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="cloud-logos-wrapper">
+          <div class="logo-item" title="Google Cloud">
+            <img src="assets/google-cloud.png" alt="Google Cloud" class="gcp-logo-img">
+            <span class="gcp-name">Google Cloud</span>
+          </div>
+          <div class="brand-divider"></div>
+          <div class="logo-item apigee-brand" title="Apigee API Management">
+            <img src="assets/apigee-logo.svg" alt="" class="apigee-svg" width="24" height="24">
+            <span class="apigee-name">Apigee <strong class="x-accent">X</strong></span>
+          </div>
+        </div>
+        <div class="brand-divider"></div>
+        <div class="brand-title-area">
+          <div class="brand-title">
+            <span id="brandTitle">Agents Meet APIs: Gemini Enterprise Agent Platform × Apigee</span>
+            <span class="brand-badge">Demo</span>
+          </div>
+          <span class="brand-subtitle" id="brandSubtitle">Agent Gateway · Apigee X · Agent Identity</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="header-tour-btn" id="headerTourBtn" title="Open the interactive Guided Tour">
+          <span aria-hidden="true">🗺️</span><span>Guided Tour</span>
+        </button>
+        <div class="status-badge" id="gatewayBadge" role="status" title="Gateway connection (from /api/config)">
+          <span class="status-dot simulated" id="gatewayDot"></span>
+          <span id="gatewayText">Connecting…</span>
+        </div>
+        <button type="button" class="admin-nav-btn" id="btnOpenAdmin" aria-controls="adminDrawer" title="Open audit log">
+          <span aria-hidden="true">📋</span><span>Audit Log</span>
+        </button>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle light / dark mode" title="Toggle light / dark mode">
+          <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg id="themeIconMoon" style="display:none" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===================== MAIN: two panes + splitter ===================== -->
+    <main class="main-content">
+      <div class="simulator-layout">
+
+        <!-- LEFT: scenarios + input + architecture card -->
+        <aside class="simulator-left-panel" id="leftPanel" aria-label="Scenarios and input">
+          <section class="section-card" id="scenarioCard">
+            <h2 class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+              Scenarios
+            </h2>
+            <div class="preset-list" id="scenarioList" role="group" aria-label="Scenario presets"></div>
+          </section>
+
+          <section class="section-card" id="inputCard">
+            <div class="form-group">
+              <div class="label-row">
+                <label class="form-label" for="promptInput">Prompt <span class="persona-chip" id="personaChip" title="Who the request runs as">Alice · Relationship Manager</span></label>
+                <span class="char-count" id="charCount">0 chars</span>
+              </div>
+              <textarea class="prompt-textarea" id="promptInput" maxlength="4000" placeholder="Pick a scenario or type a prompt for the RM Agent…"></textarea>
+              <div class="preset-sub" id="scenarioExpect"></div>
+            </div>
+            <div class="action-btn-group" style="margin-top:12px">
+              <button type="button" class="btn btn-primary" id="runBtn" style="flex:1">
+                <span class="spinner" id="runSpinner" hidden></span><span id="runBtnLabel">🚀 Ask the RM Agent</span>
+              </button>
+              <button type="button" class="btn btn-secondary" id="clearBtn" title="Clear prompt and result">Clear</button>
+            </div>
+            <div class="tips-box" style="margin-top:12px">
+              <strong>💡 Watch the trace:</strong> the result shows <b>which layer decided</b>. Agent Gateway governs the agent; Apigee governs the APIs.
+            </div>
+          </section>
+
+          <section class="demo-arch-card" id="archCard">
+            <div class="demo-arch-header">
+              <div class="demo-arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="8.5" y="14" width="7" height="7" rx="1"/><path d="M6.5 10v2h11v-2M12 12v2"/></svg>
+              </div>
+              <div class="demo-arch-title-group">
+                <span class="demo-arch-title">Demo Architecture</span>
+                <span class="demo-arch-badge">Apigee X</span>
+              </div>
+            </div>
+            <p class="demo-arch-desc">Each agent on Agent Runtime has its own <b>Agent Identity</b>. <b>Agent Gateway</b> controls where each agent may go and what content passes; <b>Apigee X</b> controls which API tools it may use, on behalf of which user, and how much; <b>IAM</b> controls the Google Cloud data it can read.</p>
+            <button type="button" class="btn btn-primary view-arch-btn" id="viewArchBtn" aria-controls="archModal">🔍 View Architecture Diagram</button>
+          </section>
+        </aside>
+
+        <div class="panel-splitter" id="panelSplitter" role="separator" aria-orientation="vertical"
+             aria-controls="leftPanel" aria-label="Resize panels (←/→, Home resets)" tabindex="0">
+          <div class="splitter-handle"></div>
+        </div>
+
+        <!-- RIGHT: results -->
+        <section class="simulator-right-panel" id="rightPanel" aria-label="Results">
+          <div class="card" id="resultCard">
+            <div class="card-header">
+              <div class="card-header-left">
+                <div class="mode-tabs" role="tablist" aria-label="Right panel mode">
+                  <button type="button" class="mode-tab active" id="tabTrace" role="tab" aria-selected="true" aria-controls="tracePane">
+                    <span aria-hidden="true">📊</span><span>Scenario Trace</span>
+                  </button>
+                  <button type="button" class="mode-tab" id="tabPlayground" role="tab" aria-selected="false" aria-controls="playgroundPane">
+                    <span aria-hidden="true">💬</span><span>Agent Playground</span><span class="mode-tab-pill">SSE Live</span>
+                  </button>
+                </div>
+                <div class="endpoint-path" id="endpointPath">POST /api/run</div>
+              </div>
+              <div class="card-header-right">
+                <span class="latency-pill" title="End-to-end latency">⏱️ <span id="latencyValue">0 ms</span></span>
+                <span class="status-pill status-idle" id="statusPill" role="status">Idle</span>
+              </div>
+            </div>
+
+            <div id="tracePane" role="tabpanel" aria-labelledby="tabTrace">
+              <div class="metrics-bar" id="metricsBar">
+                <div class="metric-item"><span class="metric-label">HTTP</span><span class="metric-val" id="metricHttp">--</span></div>
+                <div class="metric-item highlight"><span class="metric-label">Decided by</span><span class="metric-val" id="metricDecider">--</span></div>
+                <div class="metric-item"><span class="metric-label">Tool calls</span><span class="metric-val" id="metricTools">--</span></div>
+                <div class="metric-item"><span class="metric-label">LLM tokens</span><span class="metric-val" id="metricTotal">--</span></div>
+              </div>
+
+              <div class="verdict-banner" id="verdictBanner" aria-live="polite">
+                <span class="verdict-icon" id="verdictIcon" aria-hidden="true">🛡️</span>
+                <div>
+                  <div class="verdict-title" id="verdictTitle">Waiting for a request</div>
+                  <div class="verdict-desc" id="verdictDesc">Pick a scenario on the left and press Send.</div>
+                </div>
+              </div>
+
+              <!-- Who acted: the agent's own Agent Identity and the on-behalf-of delegation (filled by app.js) -->
+              <div class="identity-box" id="identityBox" aria-label="Who acted" hidden></div>
+
+              <!-- Decision trace: which layer allowed / denied, then each tool call the agent made -->
+              <div class="trace-card" id="decisionTrace">
+                <div class="trace-lanes" id="traceLanes" role="list" aria-label="Request path by layer">
+                  <div class="lane" data-lane="agent" role="listitem"><span class="lane-icon" aria-hidden="true">🤖</span><span class="lane-name" id="laneAgentName">RM Agent</span><span class="lane-sub" id="laneAgentSub">Agent Runtime</span></div>
+                  <div class="lane-arrow" aria-hidden="true">→</div>
+                  <div class="lane" data-lane="agentGateway" role="listitem"><span class="lane-icon" aria-hidden="true">🛂</span><span class="lane-name">Agent Gateway</span><span class="lane-sub">identity · registry · Model Armor</span></div>
+                  <div class="lane-arrow" aria-hidden="true">→</div>
+                  <div class="lane" data-lane="apigee" role="listitem"><span class="lane-icon" aria-hidden="true">🔶</span><span class="lane-name">Apigee X</span><span class="lane-sub">products · user scopes · quotas</span></div>
+                  <div class="lane-arrow" aria-hidden="true">→</div>
+                  <div class="lane" data-lane="backend" role="listitem"><span class="lane-icon" aria-hidden="true">🏦</span><span class="lane-name">Tools, data &amp; models</span><span class="lane-sub">banking · bureau · BigQuery · Gemini</span></div>
+                </div>
+                <ol class="step-list" id="stepList" aria-label="Tool calls"></ol>
+              </div>
+
+              <div class="response-body-wrapper" id="responseBody">
+                <div class="empty-state"><div class="empty-icon">💬</div><p>The agent's answer will appear here.</p></div>
+              </div>
+
+              <details class="raw-details" id="rawResponseDetails">
+                <summary>Raw response JSON</summary>
+                <pre class="raw-pre" id="rawResponse">{}</pre>
+              </details>
+              <details class="raw-details">
+                <summary>Request headers <span class="raw-count" id="reqHeaderCount">0</span></summary>
+                <pre class="raw-pre" id="rawReqHeaders">{}</pre>
+              </details>
+              <details class="raw-details">
+                <summary>Response headers <span class="raw-count" id="resHeaderCount">0</span></summary>
+                <pre class="raw-pre" id="rawResHeaders">{}</pre>
+              </details>
+            </div>
+
+            <!-- ===================== AGENT PLAYGROUND PANE ===================== -->
+            <div id="playgroundPane" class="pg-pane" role="tabpanel" aria-labelledby="tabPlayground" hidden>
+              <div class="pg-session-bar">
+                <div class="pg-session-meta">
+                  <span class="pg-meta-label">Agent:</span>
+                  <div class="pg-persona-switch pg-agent-switch" role="group" aria-label="Playground agent">
+                    <button type="button" class="pg-persona-btn active" id="pgAgentRm" data-agent="rm" aria-pressed="true" title="RM Agent: its Agent Identity is allowed to the banking tools">🤖 RM Agent</button>
+                    <button type="button" class="pg-persona-btn" id="pgAgentInsights" data-agent="insights" aria-pressed="false" title="Insights Agent: a different Agent Identity, not allowed to the banking tools">📈 Insights Agent</button>
+                  </div>
+                  <span class="pg-meta-label">On behalf of:</span>
+                  <div class="pg-persona-switch" role="group" aria-label="Playground persona">
+                    <button type="button" class="pg-persona-btn active" id="pgPersonaAlice" data-persona="rm-alice" aria-pressed="true" title="Relationship Manager (JWT transfer limit: SGD 100,000)">👩🏻‍💼 Alice · RM (SGD 100k)</button>
+                    <button type="button" class="pg-persona-btn" id="pgPersonaBob" data-persona="teller-bob" aria-pressed="false" title="Branch Teller (JWT transfer limit: SGD 10,000)">👨🏽‍💼 Bob · Teller (SGD 10k)</button>
+                  </div>
+                  <span class="pg-session-badge mono" id="pgSessionBadge">session: new on first message</span>
+                  <span class="pg-token-badge mono" id="pgTokenBadge" title="Cumulative LLM tokens in this session">🪙 0 tok</span>
+                  <span class="pg-token-badge mono" id="pgDelegation">🔑 token: issued on first message</span>
+                </div>
+                <div class="pg-session-actions">
+                  <button type="button" class="pg-action-btn" id="pgResetBtn" title="Start a fresh ADK session on Agent Runtime">🧹 Reset Session</button>
+                  <button type="button" class="pg-action-btn mono" id="pgEventsBtn" aria-expanded="false" aria-controls="pgRawPanel" title="Inspect sanitized SSE events from :streamQuery">{ } Raw SSE (<span id="pgEventCount">0</span>)</button>
+                </div>
+              </div>
+
+              <div class="pg-raw-panel" id="pgRawPanel" hidden>
+                <div class="pg-raw-header">
+                  <span>Sanitized ADK <code>:streamQuery?alt=sse</code> events (latest turn)</span>
+                  <button type="button" class="pg-action-btn" id="pgCloseRawBtn">Hide</button>
+                </div>
+                <pre class="raw-pre pg-raw-pre" id="pgRawPre">[]</pre>
+              </div>
+
+              <div class="pg-chat-scroll" id="pgChatList" aria-live="polite"></div>
+
+              <div class="pg-composer">
+                <label class="sr-only" for="pgInput">Message RM Agent</label>
+                <textarea class="pg-input" id="pgInput" rows="2" maxlength="4000" placeholder="Ask the RM Agent a question or follow-up in this session (Enter to send, Shift+Enter for newline)…"></textarea>
+                <button type="button" class="btn btn-primary pg-send-btn" id="pgSendBtn">
+                  <span class="spinner" id="pgSpinner" hidden></span><span id="pgSendLabel">Send ↵</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      Gateway: <code id="footerHost">—</code> • Proxy: <code id="footerBasepath">—</code> • Demo: <code>geap-apigee-demo</code>
+    </footer>
+  </div>
+
+  <!-- ===================== RIGHT-EDGE TAB + AUDIT DRAWER ===================== -->
+  <button type="button" class="floating-admin-trigger" id="adminTab" aria-controls="adminDrawer" aria-expanded="false" title="Open audit log">
+    <span class="trigger-icon" aria-hidden="true">📋</span>
+    <span class="trigger-text">Audit Log</span>
+    <span class="trigger-badge">Live</span>
+  </button>
+  <div class="admin-drawer-backdrop" id="adminDrawerBackdrop"></div>
+  <aside class="admin-drawer" id="adminDrawer" role="dialog" aria-modal="true" aria-labelledby="adminDrawerTitle">
+    <div class="admin-drawer-header">
+      <div class="admin-header-left">
+        <span class="admin-header-icon" aria-hidden="true">📋</span>
+        <div>
+          <div class="admin-title-row">
+            <h2 id="adminDrawerTitle">Audit Log</h2>
+            <span class="admin-badge">geap-apigee-demo</span>
+          </div>
+          <span class="admin-subtitle">Every request through the gateway, newest first</span>
+        </div>
+      </div>
+      <div class="admin-header-right">
+        <button type="button" class="btn btn-secondary" id="btnRefreshAdmin">🔄 Refresh</button>
+        <button type="button" class="admin-drawer-close-btn" id="btnCloseAdmin" aria-label="Close audit log (Esc)" title="Close (Esc)">&times;</button>
+      </div>
+    </div>
+    <div class="admin-drawer-content">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon blue" aria-hidden="true">📡</div><div class="kpi-data"><span class="kpi-title">Requests</span><span class="kpi-value" id="kpiRequests">0</span><span class="kpi-subtext">in this log</span></div></div>
+        <div class="kpi-card"><div class="kpi-icon green" aria-hidden="true">✅</div><div class="kpi-data"><span class="kpi-title">Allowed</span><span class="kpi-value" id="kpiAllowed">0</span><span class="kpi-subtext">verdict = allowed</span></div></div>
+        <div class="kpi-card"><div class="kpi-icon red" aria-hidden="true">⛔</div><div class="kpi-data"><span class="kpi-title">Blocked / error</span><span class="kpi-value" id="kpiBlocked">0</span><span class="kpi-subtext" id="kpiBlockRate">0% rate</span></div></div>
+        <div class="kpi-card"><div class="kpi-icon orange" aria-hidden="true">⚡</div><div class="kpi-data"><span class="kpi-title">Avg latency</span><span class="kpi-value" id="kpiLatency">0 ms</span><span class="kpi-subtext">all requests</span></div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <h3>Request ledger <span class="badge-counter" id="auditCount">0 entries</span></h3>
+            <p class="table-desc">From <code>/api/admin/logs</code>. No prompts, keys or PII are stored in this view.</p>
+          </div>
+          <label class="sr-only" for="auditSearch">Filter audit entries</label>
+          <input type="search" id="auditSearch" class="search-input" placeholder="Filter by scenario, verdict or status…">
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead><tr><th>Time</th><th>Scenario</th><th>HTTP</th><th>Verdict</th><th>Decided by</th><th>Latency</th></tr></thead>
+            <tbody id="auditTableBody"><tr><td colspan="6" class="empty-cell">No requests yet. Run a scenario to populate the ledger.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== ARCHITECTURE MODAL ===================== -->
+  <div class="modal-overlay" id="archModal" role="dialog" aria-modal="true" aria-labelledby="archModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 class="modal-heading" id="archModalTitle">Agents Meet APIs: Gemini Enterprise Agent Platform × Apigee — Architecture</h2>
+          <span class="modal-badge">Apigee X</span>
+        </div>
+        <button type="button" class="close-btn" id="archModalCloseBtn" aria-label="Close dialog (Esc)">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-diagram-container">
+          <!-- Source of truth: docs/architecture.png, served as assets/architecture.png. Falls back to the placeholder. -->
+          <img src="assets/architecture.png" data-fallback="assets/architecture-placeholder.svg" alt="Agents Meet APIs: Gemini Enterprise Agent Platform × Apigee architecture diagram" class="modal-diagram-img" id="archImg">
+        </div>
+        <div class="modal-steps-grid">
+          <div class="modal-step-card"><span class="step-tag">STEP 1</span><h3 class="step-title">Agent identity</h3><p class="step-desc">Each agent on Agent Runtime has its own Agent Identity (the RM Agent and the Insights Agent are different principals); all egress is bound to Agent Gateway.</p></div>
+          <div class="modal-step-card"><span class="step-tag">STEP 2</span><h3 class="step-title">Agent Gateway</h3><p class="step-desc">Registry + IAM access policies decide <i>where</i> the agent may go; a content check calls Model Armor on what goes out and comes back.</p></div>
+          <div class="modal-step-card"><span class="step-tag">STEP 3</span><h3 class="step-title">Apigee X</h3><p class="step-desc">MCP tools, the paid credit bureau and the LLM gateway: API products, on-behalf-of user tokens (sub = user, act = agent), user limits, paid-API quotas, model routing.</p></div>
+          <div class="modal-step-card"><span class="step-tag">PARTNER</span><h3 class="step-title">Second front door</h3><p class="step-desc">FinPal (outside GCP) reaches the same MCP tools through Apigee only, with its own product and quota.</p></div>
+          <div class="modal-step-card"><span class="step-tag">IAM</span><h3 class="step-title">Agent → Google data</h3><p class="step-desc">The RM Agent reads BigQuery as itself. IAM grants its identity one table; everything else is refused. Every run's deciding layer lands in the Audit Log.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script type="module" src="tour/tour-engine.js"></script>
+</body>
+</html>

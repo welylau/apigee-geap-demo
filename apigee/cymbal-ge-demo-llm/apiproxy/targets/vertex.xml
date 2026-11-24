@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Vertex AI (global endpoint). Order per apigee-x-ai-gateway model-routing.md "target request preparation":
+  1. AM-Prepare-Target removes every caller credential header and sets the exact operation URL
+     (target.copy.pathsuffix=false in THIS request flow, so the proxy path is never appended);
+  2. <GoogleAccessToken> inserts the runtime SA token (deploy with the runtime SA).
+  The URL below is a placeholder; target.url is always set by AM-Prepare-Target.
+  Upstream errors (4xx/5xx) raise ErrorResponseCode here, so this endpoint has its own sanitizing fault rule.
+-->
+<TargetEndpoint name="vertex">
+    <PreFlow name="PreFlow">
+        <Request>
+            <Step>
+                <Name>AM-Prepare-Target</Name>
+            </Step>
+        </Request>
+        <Response/>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <DefaultFaultRule name="upstream">
+        <AlwaysEnforce>true</AlwaysEnforce>
+        <Step>
+            <Name>AM-Mark-Target-Fault</Name>
+        </Step>
+        <Step>
+            <Name>JS-Build-Error</Name>
+        </Step>
+        <Step>
+            <Name>AM-Error-Response</Name>
+        </Step>
+    </DefaultFaultRule>
+    <HTTPTargetConnection>
+        <Authentication>
+            <GoogleAccessToken>
+                <Scopes>
+                    <Scope>https://www.googleapis.com/auth/cloud-platform</Scope>
+                </Scopes>
+            </GoogleAccessToken>
+        </Authentication>
+        <Properties>
+            <Property name="connect.timeout.millis">10000</Property>
+            <Property name="io.timeout.millis">120000</Property>
+        </Properties>
+        <URL>https://aiplatform.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/global/publishers/google/models/gemini-3.5-flash:generateContent</URL>
+    </HTTPTargetConnection>
+</TargetEndpoint>

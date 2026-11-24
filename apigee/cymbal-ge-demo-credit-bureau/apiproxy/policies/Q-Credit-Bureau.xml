@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- DESIGN.md S5: the credit bureau is a paid third-party API: 3 lookups (JSON-RPC tools/call) per minute
+     per app. Attached only when bureau.paid = "true", so the MCP handshake is never counted. rollingwindow so the
+     4th lookup inside 1 minute is always denied (1 min, not 2: S3 shares this quota); distributed + synchronous for an exact shared count. -->
+<Quota continueOnError="false" enabled="true" name="Q-Credit-Bureau" type="rollingwindow">
+    <Allow count="3"/>
+    <Interval>1</Interval>
+    <TimeUnit>minute</TimeUnit>
+    <Identifier ref="verifyapikey.VA-VerifyKey.client_id"/>
+    <Distributed>true</Distributed>
+    <Synchronous>true</Synchronous>
+</Quota>

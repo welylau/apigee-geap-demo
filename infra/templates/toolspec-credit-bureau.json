@@ -1,0 +1,10 @@
+{
+  "tools": [
+    {
+      "name": "get_credit_report",
+      "description": "Return the consumer credit report (score, band, open accounts, delinquencies, bureau notes) for a Cymbal Bank customer id such as CUST-101.",
+      "inputSchema": {"type": "object", "properties": {"customer_id": {"type": "string"}}, "required": ["customer_id"]},
+      "annotations": {"title": "Get credit report", "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": true}
+    }
+  ]
+}
